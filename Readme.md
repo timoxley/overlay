@@ -23,6 +23,8 @@ var elementSelector = ElementSelector({
 })
 ```
 
+[Demo](https://timoxley.github.com/overlay/examples/overlay/)
+
 ## License
 
   MIT
