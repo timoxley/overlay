@@ -1,7 +1,7 @@
 {
-  "name": "inlay",
-  "repo": "timoxley/inlay",
-  "description": "Overlay a particular dom element.",
+  "name": "overlay",
+  "repo": "timoxley/overlay",
+  "description": "Generate overlays over DOM elements.",
   "version": "0.0.1",
   "keywords": [],
   "dependencies": {},

@@ -5,7 +5,7 @@
 		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap.no-responsive.no-icons.min.css" rel="stylesheet">
 		<link rel="stylesheet" href="../../build/build.css">
 		<style>
-			.inlay {
+			.overlay {
 				background-color: rgba(179, 212, 253, 0.1);
 				text-align: right;
 				vertical-align: top;
@@ -44,14 +44,14 @@
     <script>
 				var ElementSelector = require('timoxley-element-selector')
 				var domify = require('component-domify')
-				var inlay = require('inlay')
-				var overlay = domify('<div class="inlay"><i class="icon icon-pencil"></i></div>')
+				var overlay = require('overlay')
+				var overlayEl = domify('<div class="overlay"><i class="icon icon-pencil"></i></div>')
 				var elementSelector = ElementSelector({
 					selector: "#container *"
 				}).on('highlight', function(el) {
-					inlay(el, overlay).show()
+					overlay(el, overlayEl).show()
 				}).on('dehighlight', function(el) {
-					inlay(el).hide()
+					overlay(el).hide()
 				})
     </script>
   </body>

@@ -1,25 +1,25 @@
-# inlay
+# Overlay
 
-  Like an overlay, but overlaid on a particular DOM element.
+  Overlays for individual DOM elements.
 
 ## Installation
 
-    $ component install timoxley/inlay
+    $ component install timoxley/overlay
 
 ## Example
 
 ```js
 
 var domify = require('component-domify')
-var inlay = require('inlay')
-var overlay = domify('<div class="inlay"><i class="icon icon-pencil"></i></div>')
+var overlay = require(overlay)
+var overlayEl = domify('<div class="overlay"><i class="icon icon-pencil"></i></div>')
 
 var elementSelector = ElementSelector({
   selector: "#container *"
 }).on('highlight', function(el) {
-  inlay(el, overlay).show() // create overlay
+  overlay(el, overlayEl).show() // create overlay
 }).on('dehighlight', function(el) {
-  inlay(el).hide() // hide overlay
+  overlay(el).hide() // hide overlay
 })
 ```
 
