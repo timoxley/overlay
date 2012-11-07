@@ -1,0 +1,17 @@
+{
+  "name": "inlay",
+  "repo": "timoxley/inlay",
+  "description": "Overlay a particular dom element.",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {},
+  "development": {
+    "timoxley/font-awesome": "*",
+    "timoxley/element-selector": "*",
+    "component/domify": "*"
+  },
+  "license": "MIT",
+  "scripts": [
+    "index.js"
+  ]
+}
