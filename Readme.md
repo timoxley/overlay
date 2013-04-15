@@ -11,8 +11,8 @@
 ```js
 
 var domify = require('component-domify')
-var overlay = require(overlay)
-var overlayEl = domify('<div class="overlay"><i class="icon icon-pencil"></i></div>')
+var overlay = require('overlay')
+var overlayEl = domify('<div class="overlay"><i class="icon icon-pencil"></i></div>')[0]
 
 var elementSelector = ElementSelector({
   selector: "#container *"
