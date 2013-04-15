@@ -4,7 +4,9 @@
   "description": "Generate overlays over DOM elements.",
   "version": "0.0.2",
   "keywords": [],
-  "dependencies": {},
+  "dependencies": {
+    "timoxley/offset": "*"
+  },
   "development": {
     "timoxley/font-awesome": "*",
     "timoxley/element-selector": "*",
