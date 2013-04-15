@@ -1,7 +1,5 @@
 "use strict"
 
-var offset = require('offset')
-
 module.exports = function(container, overlayEl) {
   if (!overlayEl) overlayEl = getOverlay(container)
   return new Overlay(container, overlayEl)
@@ -17,17 +15,13 @@ function Overlay(container, overlayEl) {
 function show(container, overlayEl) {
   if (!container || !overlayEl) return
   overlayEl.style.position = 'absolute'
-
-  var position = offset(container)
-  overlayEl.style.top = position.top + 'px'
-  overlayEl.style.left = position.left + 'px'
-
+  overlayEl.style.top = container.offsetTop + 'px'
   overlayEl.style.height = container.offsetHeight + 'px'
+  overlayEl.style.left = container.offsetLeft + 'px'
   overlayEl.style.width = container.offsetWidth + 'px'
-
   overlayEl.setAttribute('data-overlay', true)
   overlayEl.style.pointerEvents = 'none';
-  container.appendChild(overlayEl)
+  container.offsetParent.appendChild(overlayEl)
 }
 
 function hide(container, overlayEl) {
