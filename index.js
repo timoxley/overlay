@@ -13,10 +13,10 @@ function Overlay(container, overlayEl) {
 function show(container, overlayEl) {
 	if (!container || !overlayEl) return
 	overlayEl.style.position = 'absolute'
-	overlayEl.style.top = container.offsetTop
-	overlayEl.style.height = container.offsetHeight
-	overlayEl.style.left = container.offsetLeft
-	overlayEl.style.width = container.offsetWidth
+	overlayEl.style.top = container.offsetTop + 'px'
+	overlayEl.style.height = container.offsetHeight + 'px'
+	overlayEl.style.left = container.offsetLeft + 'px'
+	overlayEl.style.width = container.offsetWidth + 'px'
 	overlayEl.setAttribute('data-overlay', true)
 	overlayEl.style.pointerEvents = 'none';
 	container.appendChild(overlayEl)
