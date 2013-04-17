@@ -1,38 +1,78 @@
 "use strict"
 
-module.exports = function(container, overlayEl) {
-  if (!overlayEl) overlayEl = getOverlay(container)
-  return new Overlay(container, overlayEl)
-}
+module.exports = Overlay
 
-function Overlay(container, overlayEl) {
-  this.container = container
+function Overlay(el, overlayEl) {
+  if (!(this instanceof Overlay)) return new Overlay(el, overlayEl)
+  this.el = el
+  if (!overlayEl) overlayEl = findOverlay(el)
   this.overlayEl = overlayEl
-  this.show = show.bind(this, this.container, this.overlayEl)
-  this.hide = hide.bind(this, this.container, this.overlayEl)
 }
 
-function show(container, overlayEl) {
-  if (!container || !overlayEl) return
-  overlayEl.style.position = 'absolute'
-  overlayEl.style.top = container.offsetTop + 'px'
-  overlayEl.style.height = container.offsetHeight + 'px'
-  overlayEl.style.left = container.offsetLeft + 'px'
-  overlayEl.style.width = container.offsetWidth + 'px'
-  overlayEl.setAttribute('data-overlay', true)
-  overlayEl.style.pointerEvents = 'none';
-  container.offsetParent.appendChild(overlayEl)
+/**
+ * Display the overlay over the el.
+ *
+ * @return {Overlay} for chaining
+ * @api public
+ */
+
+Overlay.prototype.show = function show() {
+  if (!this.el || !this.overlayEl) return
+
+  this.positionOverlay()
+
+  // attach to parent
+  this.container = this.el.offsetParent
+  this.container.appendChild(this.overlayEl)
+
+  return this
 }
 
-function hide(container, overlayEl) {
-  if (container.contains(overlayEl)) container.removeChild(overlayEl)
+/**
+ * Hide overlay.
+ *
+ * @return {Overlay} for chaining
+ * @api public
+ */
+
+Overlay.prototype.hide = function hide() {
+  this.overlayEl.parentElement.removeChild(this.overlayEl)
+  return this
 }
 
-function getOverlay(container) {
-  var els = document.querySelectorAll('[data-overlay=true]')
-  for (var i = 0; i < els.length; i++) {
-    if (container.contains(els[i])) return els[i]
-  }
-  return null
+/**
+ * Inherit dimensions and position of target element.
+ *
+ * @return {Overlay} for chaining
+ * @api private
+ */
+
+Overlay.prototype.positionOverlay = function positionOverlay() {
+  var el = this.el
+  var overlay = this.overlayEl
+
+  // set styling
+  overlay.style.position = 'absolute'
+  overlay.style.top = el.offsetTop + 'px'
+  overlay.style.height = el.offsetHeight + 'px'
+  overlay.style.left = el.offsetLeft + 'px'
+  overlay.style.width = el.offsetWidth + 'px'
+  overlay.setAttribute('data-overlay', true)
+  overlay.style.pointerEvents = 'none';
+
+  return this
+}
+
+/**
+ * Try find the overlay for the target element.
+ *
+ * @param {Element} el
+ * @param {String} selector
+ * @return {Mixed}
+ */
+
+function findOverlay(el, selector) {
+  selector = selector || '[data-overlay]'
+  return el.offsetParent.querySelector(selector)
 }
 
