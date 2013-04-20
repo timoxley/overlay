@@ -5,8 +5,15 @@ module.exports = Overlay
 function Overlay(el, overlayEl) {
   if (!(this instanceof Overlay)) return new Overlay(el, overlayEl)
   this.el = el
-  if (!overlayEl) overlayEl = findOverlay(el)
+  this.container = this.el.ownerDocument.body
+  this.overlayContainer = this.findOverlayContainer()
+  if (!this.overlayContainer) {
+    this.overlayContainer = this.createOverlayContainer()
+  }
+
+  if (!overlayEl) overlayEl = this.findOverlay()
   this.overlayEl = overlayEl
+  if (!this.overlayContainer.contains(this.overlayEl)) this.overlayContainer.appendChild(this.overlayEl)
 }
 
 /**
@@ -22,8 +29,7 @@ Overlay.prototype.show = function show() {
   this.positionOverlay()
 
   // attach to parent
-  this.container = this.el.offsetParent
-  this.container.appendChild(this.overlayEl)
+  if (!this.container.contains(this.overlayContainer)) this.container.appendChild(this.overlayContainer)
 
   return this
 }
@@ -36,7 +42,7 @@ Overlay.prototype.show = function show() {
  */
 
 Overlay.prototype.hide = function hide() {
-  this.overlayEl.parentElement.removeChild(this.overlayEl)
+  if (this.container.contains(this.overlayContainer)) this.container.removeChild(this.overlayContainer)
   return this
 }
 
@@ -50,17 +56,49 @@ Overlay.prototype.hide = function hide() {
 Overlay.prototype.positionOverlay = function positionOverlay() {
   var el = this.el
   var overlay = this.overlayEl
-
+  var pos = this.el.getBoundingClientRect()
   // set styling
   overlay.style.position = 'absolute'
-  overlay.style.top = el.offsetTop + 'px'
-  overlay.style.height = el.offsetHeight + 'px'
-  overlay.style.left = el.offsetLeft + 'px'
-  overlay.style.width = el.offsetWidth + 'px'
+  overlay.style.top = this.container.scrollTop + pos.top + 'px'
+  overlay.style.height = pos.height + 'px'
+  overlay.style.left = pos.left + 'px'
+  overlay.style.width = pos.width + 'px'
   overlay.setAttribute('data-overlay', true)
   overlay.style.pointerEvents = 'none';
 
   return this
+}
+
+
+/**
+ * Try find the overlay container.
+ *
+ * @return {Mixed} Overlay container or null
+ * @api private
+ */
+
+Overlay.prototype.findOverlayContainer = function findOverlayContainer() {
+  return this.container.querySelector('[data-overlay-container]')
+}
+
+/**
+ * Create an overlay container.
+ *
+ * @return {Element} Overlay container
+ * @api private
+ */
+
+Overlay.prototype.createOverlayContainer = function createOverlayContainer() {
+  var doc = this.container.ownerDocument || document
+  var overlayContainer = doc.createElement('div')
+  overlayContainer.style.display = 'absolute'
+  overlayContainer.style.top = 0
+  overlayContainer.style.bottom = 0
+  overlayContainer.style.left = 0
+  overlayContainer.style.right = 0
+  overlayContainer.style.pointerEvents = 'none';
+  overlayContainer.setAttribute('data-overlay-container', true)
+  return overlayContainer
 }
 
 /**
@@ -69,10 +107,14 @@ Overlay.prototype.positionOverlay = function positionOverlay() {
  * @param {Element} el
  * @param {String} selector
  * @return {Mixed}
+ * @api private
  */
 
-function findOverlay(el, selector) {
-  selector = selector || '[data-overlay]'
-  return el.offsetParent.querySelector(selector)
-}
 
+Overlay.prototype.findOverlay = function findOverlay(el, selector) {
+  selector = selector || '[data-overlay]'
+
+  var overlayEl = this.overlayContainer.querySelector(selector)
+  if (!overlayEl) overlayEl = this.el.querySelector(selector)
+  return overlayEl
+}
