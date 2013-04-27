@@ -91,11 +91,14 @@ Overlay.prototype.findOverlayContainer = function findOverlayContainer() {
 Overlay.prototype.createOverlayContainer = function createOverlayContainer() {
   var doc = this.container.ownerDocument || document
   var overlayContainer = doc.createElement('div')
-  overlayContainer.style.display = 'absolute'
-  overlayContainer.style.top = 0
-  overlayContainer.style.bottom = 0
-  overlayContainer.style.left = 0
-  overlayContainer.style.right = 0
+  overlayContainer.style.position = 'absolute'
+  var pos = doc.body.getBoundingClientRect()
+  overlayContainer.style.top = -(pos.top + doc.body.scrollTop) + 'px' // magic
+  overlayContainer.style.bottom = pos.bottom + 'px'
+  overlayContainer.style.left = pos.left + 'px'
+  overlayContainer.style.right = pos.right + 'px'
+  overlayContainer.style.height = pos.height + 'px'
+  overlayContainer.style.width = pos.width + 'px'
   overlayContainer.style.pointerEvents = 'none';
   overlayContainer.setAttribute('data-overlay-container', true)
   return overlayContainer
