@@ -1,0 +1,21 @@
+<html>
+<head>
+<title>PlaceHolder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap.no-responsive.no-icons.min.css" rel="stylesheet">-->
+<script src="../build/build.js"></script>
+<link rel="stylesheet" href="../build/build.css">
+<style>
+  #redOverlay {
+    background-color: rgba(255, 0, 0, 0.3)
+  }
+</style>
+</head>
+<body>
+  <div id="redOverlay"></div>
+  <script>
+    var redOverlay = document.querySelector('#redOverlay')
+    var PageOverlay = require('overlay').page(redOverlay)
+  </script>
+</body>
+</html>

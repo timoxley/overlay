@@ -1,38 +1,93 @@
 "use strict"
 
-module.exports = function(container, overlayEl) {
-  if (!overlayEl) overlayEl = getOverlay(container)
-  return new Overlay(container, overlayEl)
+var Overlay = require('./overlay')
+
+module.exports = function(template, target) {
+  if (target instanceof NodeList) return new Group(template, target)
+  return module.exports.element(template, target)
 }
 
-function Overlay(container, overlayEl) {
-  this.container = container
-  this.overlayEl = overlayEl
-  this.show = show.bind(this, this.container, this.overlayEl)
-  this.hide = hide.bind(this, this.container, this.overlayEl)
+module.exports.Group = Group
+function Group(template, targets) {
+  var self = this
+  this.containerOverlay = new Container()
+  this.overlays = [].slice.call(targets).map(function(target) {
+    return new ElementOverlay(self.containerOverlay, template.cloneNode(), target)
+  })
+  this.show()
 }
 
-function show(container, overlayEl) {
-  if (!container || !overlayEl) return
-  overlayEl.style.position = 'absolute'
-  overlayEl.style.top = container.offsetTop + 'px'
-  overlayEl.style.height = container.offsetHeight + 'px'
-  overlayEl.style.left = container.offsetLeft + 'px'
-  overlayEl.style.width = container.offsetWidth + 'px'
-  overlayEl.setAttribute('data-overlay', true)
-  overlayEl.style.pointerEvents = 'none';
-  container.offsetParent.appendChild(overlayEl)
+Group.prototype.show = function show() {
+  this.overlays.forEach(function(overlay) {
+    overlay.show()
+  })
+  return this
 }
 
-function hide(container, overlayEl) {
-  if (container.contains(overlayEl)) container.removeChild(overlayEl)
+Group.prototype.hide = function hide() {
+  this.overlays.forEach(function(overlay) {
+    overlay.hide()
+  })
+  return this
 }
 
-function getOverlay(container) {
-  var els = document.querySelectorAll('[data-overlay=true]')
-  for (var i = 0; i < els.length; i++) {
-    if (container.contains(els[i])) return els[i]
+function makeDiv() {
+  var el = document.createElement('div')
+  document.body.appendChild(el)
+  return el
+}
+
+
+
+/**
+ * Page Overlay. Element sits over whole page. e.g. lightbox
+ * @param template {Element} template to use for wrapper. Optional.
+ */
+
+function PageOverlay(template) {
+  //if (!(this instanceof PageOverlay)) return new PageOverlay(template)
+  if (!template) template = makeDiv()
+  var htmlEl = document.body//.parentElement // html el not likely to have margins etc
+  Overlay.call(this, template, htmlEl)
+}
+
+PageOverlay.prototype = Object.create(Overlay.prototype)
+
+module.exports.page = function(template) {
+  return new PageOverlay(template)
+}
+
+module.exports.PageOverlay = PageOverlay
+
+
+function Container(template) {
+  if (!(this instanceof Container)) return new Container(template)
+  PageOverlay.call(this, template)
+  this.el.style.pointerEvents = 'none';
+  var self = this
+  //this.on('draw', function() {
+    // adjustment for containers
+    //var pos = self.target.getBoundingClientRect()
+    //console.log('pos.top', pos.top, document.body.scrollTop)
+    //self.el.style.offsetTop = '-10px'//(pos.top + document.body.scrollTop) + 'px'
+  //})
+}
+
+Container.prototype = Object.create(PageOverlay.prototype)
+module.exports.Container = Container
+
+
+module.exports.element = module.exports.ElementOverlay = ElementOverlay
+
+function ElementOverlay(containerOverlay, template, target) {
+  if (!(this instanceof ElementOverlay)) return new ElementOverlay(containerOverlay, template, target)
+  if (arguments.length === 2 || target == null) {
+    target = template
+    template = containerOverlay
+    containerOverlay = new Container()
   }
-  return null
+  if (!template) template = makeDiv()
+  Overlay.call(this, template, target)
+  containerOverlay.el.appendChild(this.el)
 }
-
+ElementOverlay.prototype = Object.create(Overlay.prototype)
