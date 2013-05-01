@@ -10,7 +10,6 @@ var Emitter = require('emitter')
  */
 
 function Overlay(el, target) {
-  //if (!(this instanceof Overlay)) return new Overlay(el, target)
   this.target = target
   var self = this
   this.el = el

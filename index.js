@@ -45,9 +45,8 @@ function makeDiv() {
  */
 
 function PageOverlay(template) {
-  //if (!(this instanceof PageOverlay)) return new PageOverlay(template)
   if (!template) template = makeDiv()
-  var htmlEl = document.body//.parentElement // html el not likely to have margins etc
+  var htmlEl = document.body.parentElement // html el not likely to have margins etc
   Overlay.call(this, template, htmlEl)
 }
 
@@ -65,12 +64,6 @@ function Container(template) {
   PageOverlay.call(this, template)
   this.el.style.pointerEvents = 'none';
   var self = this
-  //this.on('draw', function() {
-    // adjustment for containers
-    //var pos = self.target.getBoundingClientRect()
-    //console.log('pos.top', pos.top, document.body.scrollTop)
-    //self.el.style.offsetTop = '-10px'//(pos.top + document.body.scrollTop) + 'px'
-  //})
 }
 
 Container.prototype = Object.create(PageOverlay.prototype)
