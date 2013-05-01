@@ -2,7 +2,7 @@
   "name": "overlay",
   "repo": "timoxley/overlay",
   "description": "Generate overlays over DOM elements.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "keywords": [],
   "dependencies": {
     "component/raf": "*",
