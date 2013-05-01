@@ -1,12 +1,12 @@
 
-build: components index.js overlay.js page.js
+build: components index.js overlay.js
 	@component build --dev
 
 components: component.json
 	@component install --dev
 
 clean:
-	rm -fr build components template.js
+	rm -fr build components
 
 examples:
 	git checkout gh-pages

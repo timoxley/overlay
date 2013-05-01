@@ -16,7 +16,6 @@
   "license": "MIT",
   "scripts": [
     "index.js",
-    "overlay.js",
-    "stretch.js"
+    "overlay.js"
   ]
 }
