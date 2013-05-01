@@ -1,123 +1,93 @@
 "use strict"
 
-module.exports = Overlay
+var Overlay = require('./overlay')
 
-function Overlay(el, overlayEl) {
-  if (!(this instanceof Overlay)) return new Overlay(el, overlayEl)
-  this.el = el
-  this.container = this.el.ownerDocument.body
-  this.overlayContainer = this.findOverlayContainer()
-  if (!this.overlayContainer) {
-    this.overlayContainer = this.createOverlayContainer()
+module.exports = function(template, target) {
+  if (target instanceof NodeList) return new Group(template, target)
+  return module.exports.element(template, target)
+}
+
+module.exports.Group = Group
+function Group(template, targets) {
+  var self = this
+  this.containerOverlay = new Container()
+  this.overlays = [].slice.call(targets).map(function(target) {
+    return new ElementOverlay(self.containerOverlay, template.cloneNode(), target)
+  })
+  this.show()
+}
+
+Group.prototype.show = function show() {
+  this.overlays.forEach(function(overlay) {
+    overlay.show()
+  })
+  return this
+}
+
+Group.prototype.hide = function hide() {
+  this.overlays.forEach(function(overlay) {
+    overlay.hide()
+  })
+  return this
+}
+
+function makeDiv() {
+  var el = document.createElement('div')
+  document.body.appendChild(el)
+  return el
+}
+
+
+
+/**
+ * Page Overlay. Element sits over whole page. e.g. lightbox
+ * @param template {Element} template to use for wrapper. Optional.
+ */
+
+function PageOverlay(template) {
+  //if (!(this instanceof PageOverlay)) return new PageOverlay(template)
+  if (!template) template = makeDiv()
+  var htmlEl = document.body//.parentElement // html el not likely to have margins etc
+  Overlay.call(this, template, htmlEl)
+}
+
+PageOverlay.prototype = Object.create(Overlay.prototype)
+
+module.exports.page = function(template) {
+  return new PageOverlay(template)
+}
+
+module.exports.PageOverlay = PageOverlay
+
+
+function Container(template) {
+  if (!(this instanceof Container)) return new Container(template)
+  PageOverlay.call(this, template)
+  this.el.style.pointerEvents = 'none';
+  var self = this
+  //this.on('draw', function() {
+    // adjustment for containers
+    //var pos = self.target.getBoundingClientRect()
+    //console.log('pos.top', pos.top, document.body.scrollTop)
+    //self.el.style.offsetTop = '-10px'//(pos.top + document.body.scrollTop) + 'px'
+  //})
+}
+
+Container.prototype = Object.create(PageOverlay.prototype)
+module.exports.Container = Container
+
+
+module.exports.element = module.exports.ElementOverlay = ElementOverlay
+
+function ElementOverlay(containerOverlay, template, target) {
+  if (!(this instanceof ElementOverlay)) return new ElementOverlay(containerOverlay, template, target)
+  if (arguments.length === 2 || target == null) {
+    target = template
+    template = containerOverlay
+    containerOverlay = new Container()
   }
-
-  if (!overlayEl) overlayEl = this.findOverlay()
-  this.overlayEl = overlayEl
-  if (!this.overlayContainer.contains(this.overlayEl)) this.overlayContainer.appendChild(this.overlayEl)
+  if (!template) template = makeDiv()
+  Overlay.call(this, template, target)
+  containerOverlay.el.appendChild(this.el)
 }
-
-/**
- * Display the overlay over the el.
- *
- * @return {Overlay} for chaining
- * @api public
- */
-
-Overlay.prototype.show = function show() {
-  if (!this.el || !this.overlayEl) return
-
-  this.positionOverlay()
-
-  // attach to parent
-  if (!this.container.contains(this.overlayContainer)) this.container.appendChild(this.overlayContainer)
-
-  return this
-}
-
-/**
- * Hide overlay.
- *
- * @return {Overlay} for chaining
- * @api public
- */
-
-Overlay.prototype.hide = function hide() {
-  if (this.container.contains(this.overlayContainer)) this.container.removeChild(this.overlayContainer)
-  return this
-}
-
-/**
- * Inherit dimensions and position of target element.
- *
- * @return {Overlay} for chaining
- * @api private
- */
-
-Overlay.prototype.positionOverlay = function positionOverlay() {
-  var el = this.el
-  var overlay = this.overlayEl
-  var pos = this.el.getBoundingClientRect()
-  // set styling
-  overlay.style.position = 'absolute'
-  overlay.style.top = this.container.scrollTop + pos.top + 'px'
-  overlay.style.height = pos.height + 'px'
-  overlay.style.left = pos.left + 'px'
-  overlay.style.width = pos.width + 'px'
-  overlay.setAttribute('data-overlay', true)
-  overlay.style.pointerEvents = 'none';
-
-  return this
-}
-
-
-/**
- * Try find the overlay container.
- *
- * @return {Mixed} Overlay container or null
- * @api private
- */
-
-Overlay.prototype.findOverlayContainer = function findOverlayContainer() {
-  return this.container.querySelector('[data-overlay-container]')
-}
-
-/**
- * Create an overlay container.
- *
- * @return {Element} Overlay container
- * @api private
- */
-
-Overlay.prototype.createOverlayContainer = function createOverlayContainer() {
-  var doc = this.container.ownerDocument || document
-  var overlayContainer = doc.createElement('div')
-  overlayContainer.style.position = 'absolute'
-  var pos = doc.body.getBoundingClientRect()
-  overlayContainer.style.top = -(pos.top + doc.body.scrollTop) + 'px' // magic
-  overlayContainer.style.bottom = pos.bottom + 'px'
-  overlayContainer.style.left = pos.left + 'px'
-  overlayContainer.style.right = pos.right + 'px'
-  overlayContainer.style.height = pos.height + 'px'
-  overlayContainer.style.width = pos.width + 'px'
-  overlayContainer.style.pointerEvents = 'none';
-  overlayContainer.setAttribute('data-overlay-container', true)
-  return overlayContainer
-}
-
-/**
- * Try find the overlay for the target element.
- *
- * @param {Element} el
- * @param {String} selector
- * @return {Mixed}
- * @api private
- */
-
-
-Overlay.prototype.findOverlay = function findOverlay(el, selector) {
-  selector = selector || '[data-overlay]'
-
-  var overlayEl = this.overlayContainer.querySelector(selector)
-  if (!overlayEl) overlayEl = this.el.querySelector(selector)
-  return overlayEl
-}
+ElementOverlay.prototype = Object.create(Overlay.prototype)

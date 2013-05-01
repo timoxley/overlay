@@ -2,9 +2,11 @@
   "name": "overlay",
   "repo": "timoxley/overlay",
   "description": "Generate overlays over DOM elements.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "keywords": [],
   "dependencies": {
+    "component/raf": "*",
+    "component/emitter": "*"
   },
   "development": {
     "timoxley/font-awesome": "*",
@@ -13,6 +15,8 @@
   },
   "license": "MIT",
   "scripts": [
-    "index.js"
+    "index.js",
+    "overlay.js",
+    "stretch.js"
   ]
 }

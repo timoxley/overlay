@@ -1,5 +1,5 @@
 
-build: components index.js
+build: components index.js overlay.js page.js
 	@component build --dev
 
 components: component.json

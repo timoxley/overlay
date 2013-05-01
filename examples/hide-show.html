@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>PlaceHolder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="../build/build.js"></script>
+<link rel="stylesheet" href="../build/build.css">
+<style>
+  body {
+  }
+
+  #redOverlay {
+    background-color: rgba(255, 0, 0, 0.3)
+  }
+  #target {
+    margin: 100px;
+    margin-top: 100px;
+    width: 100px;
+    height: 100px;
+    outline: 1px dotted green;
+  }
+</style>
+</head>
+<body>
+    <div id="target"></div>
+    <div id="redOverlay"></div>
+  <script>
+    var target = document.querySelector('#target')
+    var redOverlay = document.querySelector('#redOverlay')
+    var elementOverlay = require('overlay').element(redOverlay, target)
+    elementOverlay.hide()
+    target.addEventListener('mouseover', function() {
+      elementOverlay.show()
+    })
+    target.addEventListener('mouseout', function() {
+      elementOverlay.hide()
+    })
+  </script>
+</body>
+</html>
+
+

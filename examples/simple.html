@@ -2,7 +2,6 @@
   <head>
     <title>PlaceHolder</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap.no-responsive.no-icons.min.css" rel="stylesheet">
 		<link rel="stylesheet" href="../build/build.css">
 		<style>
 			.overlay {
@@ -57,12 +56,13 @@
 				var domify = require('component-domify')
 				var overlay = require('overlay')
 				var overlayEl = domify('<div class="overlay"><i class="icon icon-pencil"></i></div>')[0]
+        var ol
 				var elementSelector = ElementSelector({
 					selector: "#container *"
 				}).on('highlight', function(el) {
-					overlay(el, overlayEl).show()
+					ol = overlay(overlayEl, el).show()
 				}).on('dehighlight', function(el) {
-					overlay(el).hide()
+					ol && ol.hide()
 				}).enable()
     </script>
   </body>
