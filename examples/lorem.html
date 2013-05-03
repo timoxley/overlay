@@ -3,9 +3,10 @@
     <title>PlaceHolder</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../build/build.css">
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
 		<style>
 			.overlay {
-				background-color: rgba(179, 212, 253, 0.1);
+				background-color: rgba(179, 212, 253, 0.5);
 				text-align: right;
 				vertical-align: top;
 			}
@@ -54,16 +55,20 @@
     <script>
 				var ElementSelector = require('timoxley-element-selector')
 				var domify = require('component-domify')
-				var overlay = require('overlay')
+				var Overlay = require('overlay')
+        var matchesSelector = require('component-matches-selector')
 				var overlayEl = domify('<div class="overlay"><i class="icon icon-pencil"></i></div>')[0]
-        var ol
-				var elementSelector = ElementSelector({
-					selector: "#container *"
-				}).on('highlight', function(el) {
-					ol = overlay(overlayEl, el).show()
-				}).on('dehighlight', function(el) {
-					ol && ol.hide()
-				}).enable()
+        var ol = Overlay(overlayEl)
+        document.addEventListener('mouseover', function(e) {
+          var el = e.target
+          if (matchesSelector(el, 'div *')) {
+            ol.addTarget(el)
+          }
+        })
+        document.addEventListener('mouseout', function(e) {
+          var el = e.target
+					ol.removeTarget(el)
+        })
     </script>
   </body>
 </html>

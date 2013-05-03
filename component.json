@@ -2,16 +2,14 @@
   "name": "overlay",
   "repo": "timoxley/overlay",
   "description": "Generate overlays over DOM elements.",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "keywords": [],
   "dependencies": {
-    "component/raf": "*",
-    "component/emitter": "*"
+    "component/raf": "*"
   },
   "development": {
-    "timoxley/font-awesome": "*",
-    "timoxley/element-selector": "*",
-    "component/domify": "*"
+    "component/domify": "*",
+    "timoxley/assert": "*"
   },
   "license": "MIT",
   "scripts": [

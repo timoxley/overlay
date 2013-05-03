@@ -32,8 +32,8 @@
     var evenItems = document.querySelectorAll('#target li:nth-child(even)')
     var redOverlay = document.querySelector('#redOverlay')
     var greenOverlay = document.querySelector('#greenOverlay')
-    var redGroup = overlay(redOverlay, oddItems)
-    var greenGroup = overlay(greenOverlay, evenItems)
+    var redGroup = overlay(redOverlay).addTarget(oddItems)
+    var greenGroup = overlay(greenOverlay).addTarget(evenItems)
     setTimeout(function() {
       redGroup.hide()
       greenGroup.show()

@@ -15,8 +15,6 @@ function Overlay(el, target) {
   this.el = el
 
   // make these adjustments on init only
-  this.el.style.position = 'fixed'
-  this.el.style.zIndex = 999999 // ew.
   this.draw()
 }
 
@@ -30,18 +28,19 @@ Overlay.prototype.draw = function draw() {
 }
 
 Overlay.prototype.show = function show() {
-  this.oldParent && this.oldParent.appendChild(this.el)
+  this.style.display = 'block'
   return this
 }
 
 Overlay.prototype.hide = function hide() {
-  this.oldParent = this.el.parentElement
-  this.oldParent && this.oldParent.removeChild(this.el)
+  this.style.display = 'none'
   return this
 }
 
 function stretch(el, target) {
   var pos = target.getBoundingClientRect()
+  el.style.position = 'fixed'
+  el.style.zIndex = 999999 // ew.
 
   // handles 'elastic' over-scrolling at top.
   // TODO figure out how to detect over-scrolling
