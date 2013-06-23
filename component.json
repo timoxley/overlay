@@ -5,12 +5,12 @@
   "version": "0.3.0",
   "keywords": [],
   "dependencies": {
-    "component/raf": "*",
-    "component/matches-selector": "*"
+    "component/raf": "*"
   },
   "development": {
     "component/domify": "*",
-    "timoxley/assert": "*"
+    "timoxley/assert": "*",
+    "component/matches-selector": "*"
   },
   "license": "MIT",
   "scripts": [
