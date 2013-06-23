@@ -4,6 +4,12 @@ var raf = require('raf')
 
 var overlays = []
 
+/**
+ * Convenience method.
+ * Find or create an Overlay for `template`,
+ * and add `target` to overlay, and return overlay.
+ */
+
 module.exports = function(template, target) {
   var overlay = findOrCreateOverlay(template)
   if (target) overlay.addTarget(target)
@@ -12,6 +18,10 @@ module.exports = function(template, target) {
 
 module.exports.element = module.exports
 
+/**
+ * Create an overlay over the current page.
+ */
+
 module.exports.page = function(template) {
   var overlay = findOrCreateOverlay(template)
   overlay.addTarget(document.body.parentElement)
@@ -19,8 +29,9 @@ module.exports.page = function(template) {
 }
 
 /**
- * Creates 
+ * Create an overlay.
  */
+
 function Overlay(template) {
   this.template = template
   this.targets = []
@@ -30,16 +41,27 @@ function Overlay(template) {
   this.container.style.pointerEvents = 'none';
 }
 
+/**
+ * Show overlay container.
+ */
+
 Overlay.prototype.show = function show() {
   this.container.style.display = 'block'
   return this
 }
+
+/**
+ * Hide overlay container.
+ */
 
 Overlay.prototype.hide = function show() {
   this.container.style.display = 'none'
   return this
 }
 
+/**
+ * Render overlays for each target.
+ */
 Overlay.prototype.render = function() {
   var self = this
   this.targets.forEach(function(target) {
@@ -50,6 +72,12 @@ Overlay.prototype.render = function() {
     target.stretch()
   })
 }
+
+
+/**
+ * Add an overlay target. Next `render` call will draw an
+ * overlay over the target element.
+ */
 
 Overlay.prototype.addTarget = function(targetEl) {
   var self = this
@@ -66,6 +94,10 @@ Overlay.prototype.addTarget = function(targetEl) {
   if (!foundTarget) this.targets.push(new Target(targetEl))
   return this
 }
+
+/**
+ * Remove overlay target. Removes from container immediately.
+ */
 
 Overlay.prototype.removeTarget = function(targetEl) {
   var self = this
@@ -87,18 +119,36 @@ Overlay.prototype.removeTarget = function(targetEl) {
   return this
 }
 
+
+/**
+ * Reference to an element to draw an overlay on top of.
+ */
+
 function Target(targetEl) {
   this.target = targetEl
 }
+
+/**
+ * Function used to compare two targets.
+ */
 
 Target.prototype.equals = function(t) {
   return this.target === t.target
 }
 
+/**
+ * Stretch an overlay element (`this.el`) over this target.
+ */
+
 Target.prototype.stretch = function() {
   stretch(this.el, this.target)
   return this
 }
+
+/**
+ * Find the overlay matching this `template`,
+ * or create a new Overlay for the template.
+ */
 
 function findOrCreateOverlay(template) {
   var foundOverlay = findOverlay(template)
@@ -108,6 +158,10 @@ function findOrCreateOverlay(template) {
   return overlay
 }
 
+/**
+ * Find the overlay matching this `template`.
+ */
+
 function findOverlay(template) {
   var foundOverlay = overlays.filter(function(overlay) {
     return overlay.template == template
@@ -116,14 +170,22 @@ function findOverlay(template) {
   return foundOverlay[0]
 }
 
+/**
+ * Render every overlay. This is the draw loop.
+ */
+
 function draw() {
-  draw.drawing = true
   overlays.forEach(function(overlay) {
     overlay.render()
   })
   raf(draw)
 }
+
 draw()
+
+/**
+ * Stretch an `el` over `target`.
+ */
 
 function stretch(el, target) {
   var pos = target.getBoundingClientRect()
