@@ -2,6 +2,8 @@
 
 var raf = require('raf')
 
+var overlays = []
+
 module.exports = function(template, target) {
   var overlay = findOrCreateOverlay(template)
   if (target) overlay.addTarget(target)
@@ -16,23 +18,26 @@ module.exports.page = function(template) {
   return overlay
 }
 
-var overlays = []
-
+/**
+ * Creates 
+ */
 function Overlay(template) {
   this.template = template
   this.targets = []
-  this.parent = document.createElement('div')
-  document.body.appendChild(this.parent)
-  stretch(this.parent, document.body)
-  this.parent.style.pointerEvents = 'none';
+  this.container = document.createElement('div')
+  document.body.appendChild(this.container)
+  stretch(this.container, document.body)
+  this.container.style.pointerEvents = 'none';
 }
 
 Overlay.prototype.show = function show() {
-  this.parent.style.display = 'block'
+  this.container.style.display = 'block'
+  return this
 }
 
 Overlay.prototype.hide = function show() {
-  this.parent.style.display = 'none'
+  this.container.style.display = 'none'
+  return this
 }
 
 Overlay.prototype.render = function() {
@@ -40,7 +45,7 @@ Overlay.prototype.render = function() {
   this.targets.forEach(function(target) {
     if (!target.el) {
       target.el = self.template.cloneNode(true)
-      self.parent.appendChild(target.el)
+      self.container.appendChild(target.el)
     }
     target.stretch()
   })
@@ -77,7 +82,7 @@ Overlay.prototype.removeTarget = function(targetEl) {
   }, []).forEach(function(target) {
     //remove them
     self.targets.splice(self.targets.indexOf(target), 1)
-    target.el && self.parent.removeChild(target.el)
+    target.el && self.container.removeChild(target.el)
   })
   return this
 }
