@@ -57,7 +57,7 @@
 				var domify = require('component-domify')
 				var Overlay = require('overlay')
         var matchesSelector = require('component-matches-selector')
-				var overlayEl = domify('<div class="overlay"><i class="icon icon-pencil"></i></div>')[0]
+				var overlayEl = domify('<div class="overlay"><i class="icon icon-pencil"></i></div>')
         var ol = Overlay(overlayEl)
         document.addEventListener('mouseover', function(e) {
           var el = e.target
