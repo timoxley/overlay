@@ -3,7 +3,6 @@
 <title>PlaceHolder</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script src="../build/build.js"></script>
-<link rel="stylesheet" href="../build/build.css">
 <style>
   body {
   }
@@ -39,7 +38,7 @@
   <script>
     var target = document.querySelector('#target')
     var redOverlay = document.querySelector('#redOverlay')
-    var elementOverlay = require('overlay').element(redOverlay, target)
+    var elementOverlay = require('overlay')(redOverlay).addTarget(target)
   </script>
 </body>
 </html>

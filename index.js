@@ -1,86 +1,206 @@
 "use strict"
 
-var Overlay = require('./overlay')
+var raf = require('raf')
+
+var overlays = []
+
+/**
+ * Convenience method.
+ * Find or create an Overlay for `template`,
+ * and add `target` to overlay, and return overlay.
+ */
 
 module.exports = function(template, target) {
-  if (target instanceof NodeList) return new Group(template, target)
-  return module.exports.element(template, target)
+  var overlay = findOrCreateOverlay(template)
+  if (target) overlay.addTarget(target)
+  return overlay
 }
 
-module.exports.Group = Group
-function Group(template, targets) {
+module.exports.element = module.exports
+
+/**
+ * Create an overlay over the current page.
+ */
+
+module.exports.page = function(template) {
+  var overlay = findOrCreateOverlay(template)
+  overlay.addTarget(document.body.parentElement)
+  return overlay
+}
+
+/**
+ * Create an overlay.
+ */
+
+function Overlay(template) {
+  this.template = template
+  this.targets = []
+  this.container = document.createElement('div')
+  document.body.appendChild(this.container)
+  stretch(this.container, document.body)
+  this.container.style.pointerEvents = 'none';
+}
+
+/**
+ * Show overlay container.
+ */
+
+Overlay.prototype.show = function show() {
+  this.container.style.display = 'block'
+  return this
+}
+
+/**
+ * Hide overlay container.
+ */
+
+Overlay.prototype.hide = function show() {
+  this.container.style.display = 'none'
+  return this
+}
+
+/**
+ * Render overlays for each target.
+ */
+Overlay.prototype.render = function() {
   var self = this
-  this.containerOverlay = new Container()
-  this.overlays = [].slice.call(targets).map(function(target) {
-    return new ElementOverlay(self.containerOverlay, template.cloneNode(), target)
+  this.targets.forEach(function(target) {
+    if (!target.el) {
+      target.el = self.template.cloneNode(true)
+      self.container.appendChild(target.el)
+    }
+    target.stretch()
   })
-  this.show()
 }
-
-Group.prototype.show = function show() {
-  this.overlays.forEach(function(overlay) {
-    overlay.show()
-  })
-  return this
-}
-
-Group.prototype.hide = function hide() {
-  this.overlays.forEach(function(overlay) {
-    overlay.hide()
-  })
-  return this
-}
-
-function makeDiv() {
-  var el = document.createElement('div')
-  document.body.appendChild(el)
-  return el
-}
-
 
 
 /**
- * Page Overlay. Element sits over whole page. e.g. lightbox
- * @param template {Element} template to use for wrapper. Optional.
+ * Add an overlay target. Next `render` call will draw an
+ * overlay over the target element.
  */
 
-function PageOverlay(template) {
-  if (!template) template = makeDiv()
-  var htmlEl = document.body.parentElement // html el not likely to have margins etc
-  Overlay.call(this, template, htmlEl)
-}
-
-PageOverlay.prototype = Object.create(Overlay.prototype)
-
-module.exports.page = function(template) {
-  return new PageOverlay(template)
-}
-
-module.exports.PageOverlay = PageOverlay
-
-
-function Container(template) {
-  if (!(this instanceof Container)) return new Container(template)
-  PageOverlay.call(this, template)
-  this.el.style.pointerEvents = 'none';
+Overlay.prototype.addTarget = function(targetEl) {
   var self = this
-}
-
-Container.prototype = Object.create(PageOverlay.prototype)
-module.exports.Container = Container
-
-
-module.exports.element = module.exports.ElementOverlay = ElementOverlay
-
-function ElementOverlay(containerOverlay, template, target) {
-  if (!(this instanceof ElementOverlay)) return new ElementOverlay(containerOverlay, template, target)
-  if (arguments.length === 2 || target == null) {
-    target = template
-    template = containerOverlay
-    containerOverlay = new Container()
+  if (targetEl instanceof NodeList) {
+    [].slice.call(targetEl).forEach(function(el) {
+      self.addTarget(el)
+    })
+    return this
   }
-  if (!template) template = makeDiv()
-  Overlay.call(this, template, target)
-  containerOverlay.el.appendChild(this.el)
+  var foundTarget = this.targets.reduce(function(result, target) {
+    if (target.target == targetEl) result = target
+    return result
+  }, undefined)
+  if (!foundTarget) this.targets.push(new Target(targetEl))
+  return this
 }
-ElementOverlay.prototype = Object.create(Overlay.prototype)
+
+/**
+ * Remove overlay target. Removes from container immediately.
+ */
+
+Overlay.prototype.removeTarget = function(targetEl) {
+  var self = this
+  if (targetEl instanceof NodeList) {
+    [].slice.call(targetEl).forEach(function(el) {
+      self.removeTarget(el)
+    })
+    return this
+  }
+  this.targets.reduce(function(result, target) {
+    // find matching targets
+    if (target.target == targetEl) return result.concat(target)
+    return result
+  }, []).forEach(function(target) {
+    //remove them
+    self.targets.splice(self.targets.indexOf(target), 1)
+    target.el && self.container.removeChild(target.el)
+  })
+  return this
+}
+
+
+/**
+ * Reference to an element to draw an overlay on top of.
+ */
+
+function Target(targetEl) {
+  this.target = targetEl
+}
+
+/**
+ * Function used to compare two targets.
+ */
+
+Target.prototype.equals = function(t) {
+  return this.target === t.target
+}
+
+/**
+ * Stretch an overlay element (`this.el`) over this target.
+ */
+
+Target.prototype.stretch = function() {
+  stretch(this.el, this.target)
+  return this
+}
+
+/**
+ * Find the overlay matching this `template`,
+ * or create a new Overlay for the template.
+ */
+
+function findOrCreateOverlay(template) {
+  var foundOverlay = findOverlay(template)
+  if (foundOverlay) return foundOverlay
+  var overlay = new Overlay(template)
+  overlays.push(overlay)
+  return overlay
+}
+
+/**
+ * Find the overlay matching this `template`.
+ */
+
+function findOverlay(template) {
+  var foundOverlay = overlays.filter(function(overlay) {
+    return overlay.template == template
+  })
+  if (!foundOverlay.length) return undefined
+  return foundOverlay[0]
+}
+
+/**
+ * Render every overlay. This is the draw loop.
+ */
+
+function draw() {
+  overlays.forEach(function(overlay) {
+    overlay.render()
+  })
+  raf(draw)
+}
+
+draw()
+
+/**
+ * Stretch an `el` over `target`.
+ */
+
+function stretch(el, target) {
+  var pos = target.getBoundingClientRect()
+  el.style.position = 'fixed'
+
+  // handles 'elastic' over-scrolling at top.
+  // TODO figure out how to detect over-scrolling
+  // at bottom and sides
+  el.style.top = document.body.scrollTop < 0
+   ? pos.top + document.body.scrollTop + 'px'
+   : pos.top + 'px'
+
+  el.style.bottom = pos.bottom + 'px'
+  el.style.left = pos.left + 'px'
+  el.style.right = pos.right + 'px'
+  el.style.height = pos.height + 'px'
+  el.style.width = pos.width + 'px'
+}
