@@ -1,7 +1,7 @@
 # Overlay
 
   Overlays for individual DOM elements.
-  
+  ![screen shot 2013-07-26 at 6 00 44 pm](https://f.cloud.github.com/assets/43438/861801/70c85ba2-f5da-11e2-8cd1-38ce39f2604c.png)
   [Demo](http://timoxley.github.io/overlay/examples/simple.html)
 
 ## Installation
@@ -47,8 +47,6 @@
     }, 1000)
 
 ```
-
-[Demo](http://timoxley.github.com/overlay/examples/overlay/)
 
 ## License
 
