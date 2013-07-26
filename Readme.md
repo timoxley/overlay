@@ -1,6 +1,8 @@
 # Overlay
 
   Overlays for individual DOM elements.
+  
+  [Demo](http://timoxley.github.io/overlay/examples/simple.html)
 
 ## Installation
 
